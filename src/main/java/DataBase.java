@@ -10,7 +10,7 @@ class DataBase {
 
     private static Connection getConnection() {
 
-        Connection connection ;
+        Connection connection;
 
         try {
             Class.forName(Init.DB_DRIVER);
@@ -29,17 +29,41 @@ class DataBase {
 
 
     static void createPlayer(Player player) {
-        try (Connection connection = getConnection();
-             Statement statement = connection.createStatement()) {
+        if (count(player.getName()) == 0) {
+            try (Connection connection = getConnection();
+                 Statement statement = connection.createStatement()) {
 
-            log.info("trying to create new Player {}", player);
-            String sql = String.format("insert into players (uuid, name, rating, damage, health, password , ready) values ('%s', '%s' , %d, %d, %d, '%s', %d);",
-                    player.getUuid(), player.getName(), player.getRating(), player.getDamage(), player.getHealth(), player.getPassword(), player.isReady() ? 1 : 0);
-            statement.executeUpdate(sql);
-            log.info("Ok");
+                log.info("trying to create new Player {}", player);
+                String sql = String.format("insert into players ( name, rating, damage, health, password , ready) values ('%s' , %d, %d, %d, '%s', %d);",
+                         player.getName(), player.getRating(), player.getDamage(), player.getHealth(), player.getPassword(), player.isReady() ? 1 : 0);
+                statement.executeUpdate(sql);
+                log.info("createPlayer Ok");
+                close(null, connection, statement);
+            } catch (SQLException e) {
+                log.error("createPlayer SQLException error {}", player, e);
+            }
+        }
+        else {
+            log.info("player {} already in db", player);
+        }
+    }
+
+    static void updatePlayer(Player player) {
+        try (Connection connection = getConnection()
+        ) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE players SET damage = ?, health = ? , ready= ? , rating = ? WHERE name = ?");
+            log.info("trying to update  Player {}", player);
+            statement.setInt(1, player.getDamage());
+            statement.setInt(2, player.getHealth());
+            statement.setBoolean(3, player.isReady());
+            statement.setInt(4, player.getRating());
+            statement.setString(5, player.getName());
+            statement.executeUpdate();
+            log.info("updatePlayer Ok");
             close(null, connection, statement);
         } catch (SQLException e) {
-            log.error("createPlayer SQLException error {}", player, e);
+            log.error("updatePlayer SQLException error {}", player, e);
         }
     }
 
@@ -79,7 +103,6 @@ class DataBase {
             ResultSet resultSet = statement.executeQuery(playerSql);
             while (resultSet.next()) {
                 Player player = new Player(
-                        resultSet.getString("uuid"),
                         resultSet.getString("name"),
                         resultSet.getString("password"),
                         resultSet.getInt("rating"),

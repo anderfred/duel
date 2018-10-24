@@ -1,13 +1,10 @@
-import java.util.UUID;
 
 public class Player {
     private String name, password;
     private int rating, damage, health;
     private boolean ready;
-    private String  uuid;
 
     public Player(String name, String password, int rating, int damage, int health, boolean ready) {
-        this.uuid = UUID.randomUUID().toString();
         this.name = name;
         this.password = password;
         this.rating = rating;
@@ -16,15 +13,6 @@ public class Player {
         this.ready = ready;
     }
 
-    public Player( String uuid , String name, String password, int rating, int damage, int health, boolean ready) {
-        this.name = name;
-        this.password = password;
-        this.rating = rating;
-        this.damage = damage;
-        this.health = health;
-        this.ready = ready;
-        this.uuid = uuid;
-    }
 
     public String getName() {
         return name;
@@ -54,13 +42,6 @@ public class Player {
         return health;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
 
     public void setHealth(int health) {
         this.health = health;
@@ -75,7 +56,6 @@ public class Player {
                 ", damage=" + damage +
                 ", health=" + health +
                 ", ready=" + ready +
-                ", uuid=" + uuid +
                 '}';
     }
 
