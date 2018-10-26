@@ -1,3 +1,7 @@
+package db;
+
+import entity.Player;
+import logic.ContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -5,20 +9,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-class DataBase {
-    private static final Logger log = LoggerFactory.getLogger(DataBase.class);
+public class DB implements DBRepository {
+    private static final Logger log = LoggerFactory.getLogger(DB.class);
 
     private static Connection getConnection() {
 
         Connection connection;
 
         try {
-            Class.forName(Init.DB_DRIVER);
+            Class.forName(ContextListener.DB_DRIVER);
         } catch (ClassNotFoundException e) {
             log.error("DB getDbConnection ClassNotFoundException {}", e);
         }
         try {
-            connection = DriverManager.getConnection(Init.DB_CONNECTION_URI, Init.DB_USERNAME, Init.DB_PASSWORD);
+            connection = DriverManager.getConnection(ContextListener.DB_CONNECTION_URI, ContextListener.DB_USERNAME, ContextListener.DB_PASSWORD);
             log.info("Connected {}", connection.toString());
             return connection;
         } catch (SQLException e) {
@@ -28,32 +32,31 @@ class DataBase {
     }
 
 
-    static void createPlayer(Player player) {
+    public void createPlayer(Player player) {
         if (count(player.getName()) == 0) {
             try (Connection connection = getConnection();
                  Statement statement = connection.createStatement()) {
 
-                log.info("trying to create new Player {}", player);
+                log.info("trying to create new entity.Player {}", player);
                 String sql = String.format("insert into players ( name, rating, damage, health, password , ready) values ('%s' , %d, %d, %d, '%s', %d);",
-                         player.getName(), player.getRating(), player.getDamage(), player.getHealth(), player.getPassword(), player.isReady() ? 1 : 0);
+                        player.getName(), player.getRating(), player.getDamage(), player.getHealth(), player.getPassword(), player.isReady() ? 1 : 0);
                 statement.executeUpdate(sql);
                 log.info("createPlayer Ok");
                 close(null, connection, statement);
             } catch (SQLException e) {
                 log.error("createPlayer SQLException error {}", player, e);
             }
-        }
-        else {
+        } else {
             log.info("player {} already in db", player);
         }
     }
 
-    static void updatePlayer(Player player) {
+    public void updatePlayer(Player player) {
         try (Connection connection = getConnection()
         ) {
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE players SET damage = ?, health = ? , ready= ? , rating = ? WHERE name = ?");
-            log.info("trying to update  Player {}", player);
+            log.info("trying to update  entity.Player {}", player);
             statement.setInt(1, player.getDamage());
             statement.setInt(2, player.getHealth());
             statement.setBoolean(3, player.isReady());
@@ -67,7 +70,7 @@ class DataBase {
         }
     }
 
-    static Player findByName(String name) {
+    public Player findByName(String name) {
         if (count(name) > 0) {
 
             try (Connection connection = getConnection();
@@ -93,7 +96,7 @@ class DataBase {
         return null;
     }
 
-    static List<Player> findAll() {
+    public List<Player> findAll() {
         List<Player> allPlayers = new ArrayList<>();
 
         try (Connection connection = getConnection();
@@ -119,7 +122,7 @@ class DataBase {
         return allPlayers;
     }
 
-    private static void close(ResultSet resultSet, Connection connection, Statement statement) {
+    private void close(ResultSet resultSet, Connection connection, Statement statement) {
         try {
             if (resultSet != null) resultSet.close();
             if (statement != null) statement.close();
@@ -130,7 +133,7 @@ class DataBase {
         }
     }
 
-    private static int count(String column) {
+    private int count(String column) {
 
         int count = 0;
         try (Connection connection = getConnection();
@@ -150,23 +153,33 @@ class DataBase {
         return count;
     }
 
-    private static void delete(String name) {
+    public void delete(String name) {
         String sql = "delete from players where name='" + name + "';";
         if (count(name) == 1) {
             try (Connection connection = getConnection();
                  Statement statement = connection.createStatement()
             ) {
-                log.info("DataBase delete -> trying to delete:{}", name);
+                log.info("db.DB delete -> trying to delete:{}", name);
                 statement.executeUpdate(sql);
-                log.info("DataBase successfully deleted:{}", name);
+                log.info("db.DB successfully deleted:{}", name);
 
             } catch (SQLException e) {
-                log.error("DataBase delete SQLException {}", e);
+                log.error("db.DB delete SQLException {}", e);
             }
         } else {
-            log.info("DataBase delete -> no player for name:{}", name);
+            log.info("db.DB delete -> no player for name:{}", name);
         }
     }
 
+    @Override
+    public boolean userIsExist(String name, String password) {
+        if (name != null) {
+            Player player = findByName(name);
+            if (player != null) {
+                if (player.getPassword().equals(password)) return true;
+            }
+        }
+        return false;
+    }
 }
 

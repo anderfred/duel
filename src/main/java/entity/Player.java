@@ -1,3 +1,4 @@
+package entity;
 
 public class Player {
     private String name, password;
@@ -49,7 +50,7 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{" +
+        return "entity.Player{" +
                 "name='" + name + '\'' +
                 ", password='" + password + '\'' +
                 ", rating=" + rating +

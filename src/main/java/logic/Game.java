@@ -1,3 +1,6 @@
+package logic;
+
+import entity.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,43 +25,38 @@ public class Game {
                 if (player.getName().equals(player1.getName())) {
                     log.info("{} hit {} on {}", player1.getName(), player2.getName(), player1.getDamage());
                     player2.setHealth(player2.getHealth() - player1.getDamage());
-                    DataBase.updatePlayer(player2);
+                    ContextListener.db.get().updatePlayer(player2);
                 } else {
                     log.info("{} hit {} on {}", player2.getName(), player1.getName(), player2.getDamage());
                     player1.setHealth(player1.getHealth() - player2.getDamage());
-                    DataBase.updatePlayer(player1);
+                    ContextListener.db.get().updatePlayer(player1);
                 }
             }
+            log.info("{} {}", player1, player2);
             if (player1.getHealth() < 0) {
                 player1Dead = true;
-                Init.duels.remove(player1.getName());
-                Init.duels.remove(player2.getName());
-                player1.setHealth(p1Health + 1);
-                player1.setDamage(player1.getDamage() + 1);
-                player1.setRating(player1.getRating() - 1);
-                player2.setRating(player2.getRating() + 1);
-                player2.setHealth(p2Health + 1);
-                player2.setDamage(player2.getDamage() + 1);
-                DataBase.updatePlayer(player1);
-                DataBase.updatePlayer(player2);
-                log.info("Player 1 is dead {}", player1.getName());
+                changeStatAfterFight(player1, -1);
+                changeStatAfterFight(player2, 1);
+                log.info("entity.Player 1 is dead {}", player1.getName());
             }
             if (player2.getHealth() < 0) {
-                Init.duels.remove(player2.getName());
-                Init.duels.remove(player1.getName());
                 player2Dead = true;
-                player2.setHealth(p2Health + 1);
-                player2.setDamage(player2.getDamage() + 1);
-                player2.setRating(player2.getRating() - 1);
-                player1.setRating(player1.getRating() + 1);
-                player1.setHealth(p1Health + 1);
-                player1.setDamage(player1.getDamage() + 1);
-                DataBase.updatePlayer(player1);
-                DataBase.updatePlayer(player2);
-                log.info("Player 2 {} is dead", player2.getName());
+                changeStatAfterFight(player1, 1);
+                changeStatAfterFight(player2, -1);
+                log.info("entity.Player 2 {} is dead", player2.getName());
             }
         }
     }
+
+
+    private void changeStatAfterFight(Player player, int mod) {
+        if (player.getName().equals(player1.getName())) player.setHealth(p1Health + 1);
+        else player.setHealth(p2Health + 1);
+        player.setDamage(player.getDamage() + 1);
+        player.setRating(player.getRating() + mod);
+        ContextListener.db.get().updatePlayer(player);
+    }
+
 
     public Player getPlayer1() {
         return player1;
@@ -68,13 +66,6 @@ public class Game {
         return player2;
     }
 
-    public int getP1Health() {
-        return p1Health;
-    }
-
-    public int getP2Health() {
-        return p2Health;
-    }
 
     public boolean isPlayer1Dead() {
         return player1Dead;
