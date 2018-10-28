@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ContextListener implements ServletContextListener {
 
     //Параметры подключения в БД
-    public static final String DB_CONNECTION_URI = "jdbc:mysql://lt80glfe2gj8p5n2.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/s2wmdrzdc0n4x4bm?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=UTF-8";
-    public static final String DB_USERNAME = "c9lo3p80ufnbroz4";
-    public static final String DB_PASSWORD = "apzj75ke0vtspys6";
+    public static final String DB_CONNECTION_URI = "jdbc:mysql://lt80glfe2gj8p5n2.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/qrk4ss7n35sq8p20?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=UTF-8";
+    public static final String DB_USERNAME = "vn7df55kjrjje88j";
+    public static final String DB_PASSWORD = "klam2ojdeqlfufi6";
     public static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
 
     //Очередь игроков готовых к матчу
