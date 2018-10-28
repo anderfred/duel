@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Date;
 
-//@WebServlet("/")
+@WebServlet("/")
 public class Login extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(Login.class);
 
