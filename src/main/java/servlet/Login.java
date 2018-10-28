@@ -23,7 +23,7 @@ public class Login extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ServletUtils.setDateAndCountToZero();
-        RequestDispatcher dispatcher = req.getRequestDispatcher("/templates/login.jsp");
+        RequestDispatcher dispatcher = req.getRequestDispatcher("templates/login.jsp");
         log.info("doGet");
         req.setAttribute("sqlCount", ContextListener.sqlCount.get());
         req.setAttribute("sqlTime", 0);
