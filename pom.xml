@@ -7,7 +7,7 @@
     <groupId>com.anderfred</groupId>
     <artifactId>duel</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <properties>
         <java.version>1.8</java.version>
         <mysql-connector>8.0.13</mysql-connector>
