@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
-public class DB implements DBRepository {
+//Работа с базой данных
+public class DB {
     private static final Logger log = LoggerFactory.getLogger(DB.class);
 
-    private static Connection getConnection() {
+    public static Connection getConnection() {
 
         Connection connection;
 
@@ -36,12 +36,13 @@ public class DB implements DBRepository {
         if (count(player.getName()) == 0) {
             try (Connection connection = getConnection();
                  Statement statement = connection.createStatement()) {
-
+                ContextListener.sqlCount.incrementAndGet();
                 log.info("trying to create new entity.Player {}", player);
                 String sql = String.format("insert into players ( name, rating, damage, health, password , ready) values ('%s' , %d, %d, %d, '%s', %d);",
                         player.getName(), player.getRating(), player.getDamage(), player.getHealth(), player.getPassword(), player.isReady() ? 1 : 0);
                 statement.executeUpdate(sql);
-                log.info("createPlayer Ok");
+
+                log.info("createPlayer Ok statements:");
                 close(null, connection, statement);
             } catch (SQLException e) {
                 log.error("createPlayer SQLException error {}", player, e);
@@ -54,6 +55,7 @@ public class DB implements DBRepository {
     public void updatePlayer(Player player) {
         try (Connection connection = getConnection()
         ) {
+            ContextListener.sqlCount.incrementAndGet();
             PreparedStatement statement = connection.prepareStatement(
                     "UPDATE players SET damage = ?, health = ? , ready= ? , rating = ? WHERE name = ?");
             log.info("trying to update  entity.Player {}", player);
@@ -63,6 +65,7 @@ public class DB implements DBRepository {
             statement.setInt(4, player.getRating());
             statement.setString(5, player.getName());
             statement.executeUpdate();
+
             log.info("updatePlayer Ok");
             close(null, connection, statement);
         } catch (SQLException e) {
@@ -72,9 +75,9 @@ public class DB implements DBRepository {
 
     public Player findByName(String name) {
         if (count(name) > 0) {
-
             try (Connection connection = getConnection();
                  Statement statement = connection.createStatement()) {
+                ContextListener.sqlCount.incrementAndGet();
                 log.info("Trying executeSql {}", name);
                 String playerSql = "SELECT * FROM players where name='" + name + "'";
                 ResultSet resultSet = statement.executeQuery(playerSql);
@@ -85,7 +88,6 @@ public class DB implements DBRepository {
                         resultSet.getInt("damage"),
                         resultSet.getInt("health"),
                         resultSet.getBoolean("ready"));
-                close(resultSet, connection, statement);
                 log.info("FindByName {}", player);
                 return player;
             } catch (SQLException e) {
@@ -100,7 +102,8 @@ public class DB implements DBRepository {
         List<Player> allPlayers = new ArrayList<>();
 
         try (Connection connection = getConnection();
-             Statement statement = connection.createStatement();) {
+             Statement statement = connection.createStatement()) {
+            ContextListener.sqlCount.incrementAndGet();
             log.info("Trying find all players executeSql {}");
             String playerSql = "SELECT * FROM players;";
             ResultSet resultSet = statement.executeQuery(playerSql);
@@ -121,7 +124,7 @@ public class DB implements DBRepository {
         }
         return allPlayers;
     }
-
+    //Закрываем открытые соединения
     private void close(ResultSet resultSet, Connection connection, Statement statement) {
         try {
             if (resultSet != null) resultSet.close();
@@ -137,8 +140,9 @@ public class DB implements DBRepository {
 
         int count = 0;
         try (Connection connection = getConnection();
-             Statement statement = connection.createStatement();
+             Statement statement = connection.createStatement()
         ) {
+            ContextListener.sqlCount.incrementAndGet();
             log.info("Trying executeSql {}", column);
             String countSql = "SELECT count(*) as count FROM players where name='" + column + "'";
             ResultSet resultSet = statement.executeQuery(countSql);
@@ -159,9 +163,11 @@ public class DB implements DBRepository {
             try (Connection connection = getConnection();
                  Statement statement = connection.createStatement()
             ) {
+                ContextListener.sqlCount.incrementAndGet();
                 log.info("db.DB delete -> trying to delete:{}", name);
                 statement.executeUpdate(sql);
                 log.info("db.DB successfully deleted:{}", name);
+
 
             } catch (SQLException e) {
                 log.error("db.DB delete SQLException {}", e);
@@ -171,9 +177,9 @@ public class DB implements DBRepository {
         }
     }
 
-    @Override
     public boolean userIsExist(String name, String password) {
         if (name != null) {
+            ContextListener.sqlCount.incrementAndGet();
             Player player = findByName(name);
             if (player != null) {
                 if (player.getPassword().equals(password)) return true;
@@ -181,5 +187,6 @@ public class DB implements DBRepository {
         }
         return false;
     }
+
 }
 

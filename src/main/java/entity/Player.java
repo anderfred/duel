@@ -1,5 +1,5 @@
 package entity;
-
+//Класс игрока
 public class Player {
     private String name, password;
     private int rating, damage, health;
@@ -68,9 +68,6 @@ public class Player {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public void setReady(boolean ready) {
         this.ready = ready;

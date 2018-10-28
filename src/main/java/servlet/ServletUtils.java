@@ -1,9 +1,11 @@
 package servlet;
 
 import entity.Player;
+import logic.ContextListener;
 import logic.Game;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 public class ServletUtils {
     public static Player playerEnemy(String name, Game game) {
@@ -21,5 +23,9 @@ public class ServletUtils {
         else request.setAttribute("enemy_rating", player.getRating());
         if (isHero) request.setAttribute("hero_health", player.getHealth());
         else request.setAttribute("enemy_health", player.getHealth());
+    }
+    public static void setDateAndCountToZero(){
+        ContextListener.date.get().setTime(new Date().getTime());
+        ContextListener.sqlCount.set(0);
     }
 }

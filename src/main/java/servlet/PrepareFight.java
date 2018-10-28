@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Date;
 
 @WebServlet("/prepareFight")
 public class PrepareFight extends HttpServlet {
@@ -23,6 +24,8 @@ public class PrepareFight extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Date sqlTime = new Date();
+        ServletUtils.setDateAndCountToZero();
         HttpSession session = req.getSession();
         String name = (String) session.getAttribute("name");
         Game game = ContextListener.duels.get().get(name);
@@ -34,6 +37,8 @@ public class PrepareFight extends HttpServlet {
         ServletUtils.setAttributesForPlayer(req, enemy, false);
         log.info("doGet {} {} ", hero, enemy);
         RequestDispatcher dispatcher = req.getRequestDispatcher("/templates/prepareFight.jsp");
+        req.setAttribute("sqlCount", ContextListener.sqlCount.get());
+        req.setAttribute("sqlTime", (new Date().getTime()-sqlTime.getTime()));
         dispatcher.forward(req, resp);
     }
 }

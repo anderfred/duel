@@ -23,14 +23,19 @@ public class DuelWait extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ServletUtils.setDateAndCountToZero();
         HttpSession session = req.getSession();
         if (ContextListener.duels.get().containsKey(session.getAttribute("name"))) {
             log.info("doGet ");
             RequestDispatcher dispatcher = req.getRequestDispatcher("/prepareFight");
+            req.setAttribute("sqlTime", 0);
+            req.setAttribute("sqlCount", ContextListener.sqlCount.get());
             dispatcher.forward(req, resp);
         } else {
             RequestDispatcher dispatcher = req.getRequestDispatcher("/templates/duelWait.jsp");
             log.info("doGet");
+            req.setAttribute("sqlCount", ContextListener.sqlCount.get());
+            req.setAttribute("sqlTime", 0);
             dispatcher.forward(req, resp);
         }
 
@@ -38,9 +43,11 @@ public class DuelWait extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        ServletUtils.setDateAndCountToZero();
         RequestDispatcher dispatcher = req.getRequestDispatcher("/templates/duelWait.jsp");
         log.info("doPost");
+        req.setAttribute("sqlCount", ContextListener.sqlCount.get());
+        req.setAttribute("sqlTime", 0);
         dispatcher.forward(req, resp);
     }
 }
