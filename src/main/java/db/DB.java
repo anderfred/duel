@@ -12,6 +12,26 @@ import java.util.List;
 public class DB {
     private static final Logger log = LoggerFactory.getLogger(DB.class);
 
+    public void createTable(){
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
+            String sql = "CREATE TABLE players(\n" +
+                    "  name VARCHAR(255) NOT NULL,\n" +
+                    "  password VARCHAR(255) NOT NULL ,\n" +
+                    "  health int NOT NULL ,\n" +
+                    "  damage int NOT NULL ,\n" +
+                    "  rating int NOT NULL,\n" +
+                    "  ready boolean NOT NULL ,\n" +
+                    "  PRIMARY KEY (name)\n" +
+                    ")DEFAULT CHARSET=utf8;";
+            statement.execute(sql);
+
+            log.info(" Ok :");
+            close(null, connection, statement);
+        } catch (SQLException e) {
+            log.error("createPlayer SQLException error {}", e);
+        }
+    }
     public static Connection getConnection() {
 
         Connection connection;

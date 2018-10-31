@@ -45,6 +45,7 @@ public class ContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         log.info("Starting Up!");
+        db.get().createTable();
     }
 
     @Override
